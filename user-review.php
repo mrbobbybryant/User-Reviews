@@ -2,7 +2,7 @@
 /**
  * Plugin Name: User Reviews
  * Plugin URI: http://hatrackmedia.com
- * Description: This plugin proves a simple form, which lets website visitors submit reviews.
+ * Description: This plugin provides a simple form, which lets website visitors submit reviews.
  * Author: Bobby Bryant
  * Author URI: http://hatrackmedia.com
  * Version: 0.0.1
@@ -59,6 +59,7 @@ add_shortcode ( 'wp-user-review', 'dwwp_review_form_shortcode');
 
 function dwwp_review_post_type() {
 	
+	// Define CPT Variables. Changing these will alter the post type's name everywhere.
 	$singular = 'Review';
 	$plural = 'Reviews';
 
@@ -114,25 +115,20 @@ function dwwp_review_post_type() {
 add_action( 'init', 'dwwp_review_post_type' );
 
 /**
- * Save Review Form Custom Fields as Post Meta.
- */
-
-/**
  * Save User Submitted Data as Draft Review.
  */
 
 function dwwp_process_review_post() {
+	//Verify Form has content.
 	if ( ! isset( $_POST['dwwp-review-nonce'] ) ) {
       return;
     }
-
+    // Verify correct nonce
     if ( ! wp_verify_nonce( $_POST['dwwp-review-nonce'], basename( __FILE__ ) ) ) {
     	return;
     }
-	// if (!isset( $_POST['movie_name'] ) ) {
-	// 	return;
-	// }
 
+    // Programmatically create new draft post.
 	$review_post = array(
 		'post_title' => sanitize_text_field( $_POST['movie_name'] . '-' . current_time('Y-m-d') ),
 		'post_status' => 'draft',

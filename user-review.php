@@ -30,7 +30,7 @@ function dwwp_review_form_shortcode ( $atts, $content = null ) {
 		    <label for="movie_name" class=""><?php _e( 'Movie Name', 'dwwp-textdomain' )?></label>
 			<input type="text" class="required" name="movie_name" id="movie_name" value="" />
 
-			<select name="movie-rating" id="movie-rating" form='movie-review'>
+			<select name="movie_rating" id="movie_rating" form='movie-review'>
 	          
 	          <option value="Five"><?php _e( 'Five', 'dwwp-textdomain' )?></option>
 	          <option value="Four"><?php _e( 'Four', 'dwwp-textdomain' )?></option>
@@ -40,8 +40,8 @@ function dwwp_review_form_shortcode ( $atts, $content = null ) {
 	          
 	      	</select>
 			
-			<label for="user-review" class=""><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
-	      	<textarea name="user-review" id="user-review" rows="8"></textarea>
+			<label for="user_review" class=""><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
+	      	<textarea name="user_review" id="user_review" rows="8"></textarea>
 
 	      	<input type="submit">
 		</fieldset>
@@ -139,12 +139,12 @@ function dwwp_process_review_post() {
 	$the_post_id = wp_insert_post( $review_post, true );
 
 	//Store Custom Field Values.
-	$movie_rating = sanitize_text_field( $_POST['movie-rating'] );
-	$user_review = sanitize_text_field( $_POST['user-review'] ); 
+	$movie_rating = sanitize_text_field( $_POST['movie_rating'] );
+	$user_review = sanitize_text_field( $_POST['user_review'] ); 
 
 	//Process Custom fields into database.
-	update_post_meta( $the_post_id, 'movie-rating', $movie_rating );
-	update_post_meta( $the_post_id, 'user-review', $user_review );
+	update_post_meta( $the_post_id, 'movie_rating', $movie_rating );
+	update_post_meta( $the_post_id, 'user_review', $user_review );
 }
 add_action( 'init', 'dwwp_process_review_post' );
 
@@ -159,5 +159,65 @@ function dwwp_review_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'dwwp_review_styles' );
 
+/**
+ * Add Custom Columns to Review list post table.
+ */
+
+function dwwp_add_review_columns($columns) {
+
+	//Append Columns Array with your custom columns.
+	$columns = array_merge( $columns,
+		array( 'movie_rating' => __('Movie Rating'),
+				'user_review' => __('User Review') ) );
+
+	return $columns;
+
+}
+add_filter( 'manage_review_posts_columns', 'dwwp_add_review_columns' );
+
+/**
+ * Populate the custom columns in the Review list post table with post meta.
+ */
+
+function dwwp_custom_review_column( $column ) {
+	
+	switch ( $column ) {
+		case 'movie_rating':
+			echo get_post_meta( get_the_ID(), 'movie_rating', true );
+			break;
+
+		case 'user_review':
+			echo get_post_meta( get_the_ID(), 'user_review', true );
+			break;
+	}
+}
+add_action( 'manage_review_posts_custom_column', 'dwwp_custom_review_column' );
+
+/**
+ * Make review custom column user_rating sortable.
+ */
+
+function dwwp_user_reivew_sortable( $columns ) {
+
+	$columns['movie_rating'] = 'Movie Rating';
+
+	return $columns;
+
+}
+add_filter( 'manage_edit-review_sortable_columns', 'dwwp_user_reivew_sortable' );
+
+ 
+function dwwp_review_column_orderby( $query ) {  
+    if( ! is_admin() )  
+        return;  
+
+    $orderby = $query->get( 'orderby');  
+
+    if( 'event_date' == $orderby ) {  
+        $query->set('meta_key','movie_rating');  
+        $query->set('orderbt','meta_value');  
+    }  
+} 
+add_action( 'pre_get_posts', 'dwwp_review_column_orderby' ); 
 
 

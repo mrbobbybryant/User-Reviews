@@ -14,7 +14,7 @@
 	padding: 20px;
 	overflow: hidden;
 }
-#user_review{
+.user_review{
 	height: 100px;
 	width: 75%;
 }

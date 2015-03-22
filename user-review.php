@@ -152,10 +152,14 @@ add_action( 'init', 'dwwp_process_review_post' );
 
 function dwwp_review_styles() {
 
+	$screen = get_current_screen();
+
+	if ( is_object($screen) && 'review' == $screen->post_type ) {
+
 	wp_enqueue_style( 'review-styles', plugins_url( '/css/review.css', __FILE__ ) );
 
+	}
 }
-add_action( 'wp_enqueue_scripts', 'dwwp_review_styles' );
 add_action( 'admin_enqueue_scripts', 'dwwp_review_styles' );
 
 /**
@@ -238,10 +242,10 @@ function review_meta_callback( $post ) {
     $review_stored_meta = get_post_meta( $post->ID );
     ?>
 		<div>
-			<div>
+			<div class='review-title'>
 				<h2><?php the_title() ?></h2>
 			</div>
-			<div>
+			<div class='review-content'>
     			<h2><?php echo $review_stored_meta['movie_rating'][0]; ?></h2>
     			<p><?php echo $review_stored_meta['user_review'][0]; ?></p>
 			</div>

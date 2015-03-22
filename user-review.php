@@ -158,6 +158,7 @@ function dwwp_review_styles() {
 
 }
 add_action( 'wp_enqueue_scripts', 'dwwp_review_styles' );
+add_action( 'admin_enqueue_scripts', 'dwwp_review_styles' );
 
 /**
  * Add Custom Columns to Review list post table.
@@ -206,7 +207,7 @@ function dwwp_user_reivew_sortable( $columns ) {
 }
 add_filter( 'manage_edit-review_sortable_columns', 'dwwp_user_reivew_sortable' );
 
- 
+ //This doesn't work yet.
 function dwwp_review_column_orderby( $query ) {  
     if( ! is_admin() )  
         return;  
@@ -220,4 +221,51 @@ function dwwp_review_column_orderby( $query ) {
 } 
 add_action( 'pre_get_posts', 'dwwp_review_column_orderby' ); 
 
+/**
+ * Adds a meta box to the post editing screen
+ */
+function dwwp_review_meta_box() {
+    add_meta_box(
+      'review_meta_box',
+      __( 'User Review'),
+      'review_meta_callback',
+      'review'
+    );
+}
+add_action( 'add_meta_boxes', 'dwwp_review_meta_box' );
 
+// Callback function for review post type.
+function review_meta_callback( $post ) {
+
+	wp_nonce_field( basename( __FILE__ ), 'hrm_nonce' );
+    $review_stored_meta = get_post_meta( $post->ID );
+	?>
+	   <div>
+	   	<div class="meta-row">
+	   		<div class="meta-th">
+	   			<label for="movie_rating"><?php _e( 'Movie Rating', 'dwwp-textdomain' )?></label>
+	   		</div>
+	   		<div class="meta-td">
+	   			<select name="movie_rating" id="movie_rating" form='movie-review'>
+          
+		          <option value="Five" <?php if ( !empty ( $review_stored_meta['movie_rating'] ) ) selected( $review_stored_meta['movie_rating'][0], 'Five' ); ?>><?php _e( 'Five', 'dwwp-textdomain' ); ?></option>
+		          <option value="Four" <?php if ( !empty ( $review_stored_meta['movie_rating'] ) ) selected( $review_stored_meta['movie_rating'][0], 'Four' ); ?>><?php _e( 'Four', 'dwwp-textdomain' ); ?></option>
+		          <option value="Three" <?php if ( !empty ( $review_stored_meta['movie_rating'] ) ) selected( $review_stored_meta['movie_rating'][0], 'Three' ); ?>><?php _e( 'Three', 'dwwp-textdomain' ); ?></option>
+		          <option value="Two" <?php if ( !empty ( $review_stored_meta['movie_rating'] ) ) selected( $review_stored_meta['movie_rating'][0], 'Two' ); ?>><?php _e( 'Two', 'dwwp-textdomain' ); ?></option>
+		          <option value="One" <?php if ( !empty ( $review_stored_meta['movie_rating'] ) ) selected( $review_stored_meta['movie_rating'][0], 'One' ); ?>><?php _e( 'One', 'dwwp-textdomain' ); ?></option>
+		          
+		      	</select>
+	   		</div>
+	   	</div>
+	   	<div class="meta-row">
+	   		<div class="meta-th">
+	   			<label for="user_review"><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
+	   		</div>
+	   		<div class="meta-td">
+	   			<label for="user_review" class=""></label>
+      			<textarea name="user_review" id="user_review" rows="8"><?php if ( isset ( $review_stored_meta['user_review'] ) ) echo esc_attr( $review_stored_meta['user_review'][0] ); ?></textarea>
+	   		</div>
+	   	</div>
+	   </div>
+<?php
+}

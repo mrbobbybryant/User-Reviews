@@ -24,26 +24,30 @@ function dwwp_review_form_shortcode ( $atts, $content = null ) {
 
 	<form action="" id='movie-review' method='post' class='form' >
 		<fieldset>
-			<legend>Movie Review</legend>
+			<legend class="form-legend">Movie Review</legend>
 			<?php wp_nonce_field(basename( __FILE__ ),'dwwp-review-nonce'); ?>
-		    
-		    <label for="movie_name" class=""><?php _e( 'Movie Name', 'dwwp-textdomain' )?></label>
-			<input type="text" class="required" name="movie_name" id="movie_name" value="" />
-
-			<select name="movie_rating" id="movie_rating" form='movie-review'>
-	          
-	          <option value="Five"><?php _e( 'Five', 'dwwp-textdomain' )?></option>
-	          <option value="Four"><?php _e( 'Four', 'dwwp-textdomain' )?></option>
-	          <option value="Three"><?php _e( 'Three', 'dwwp-textdomain' )?></option>
-	          <option value="Two"><?php _e( 'Two', 'dwwp-textdomain' )?></option>
-	          <option value="One"><?php _e( 'One', 'dwwp-textdomain' )?></option>
-	          
-	      	</select>
+		    <div class='form-group'>
+		    	<label for="movie_name" class="form-control"><?php _e( 'Movie Name', 'dwwp-textdomain' )?></label>
+				<input type="text" class="form-input" name="movie_name" id="movie_name" value="" placeholder="Enter Movie Title Here."/>
+		    </div>
+		    <div class='form-group'>
+		    	<label for="movie_rating" class="form-control"><?php _e( 'Movie Name', 'dwwp-textdomain' )?></label>
+				<select name="movie_rating" id="movie_rating" class="form-input" form='movie-review'>
+		          
+		          <option value="Five"><?php _e( 'Five', 'dwwp-textdomain' )?></option>
+		          <option value="Four"><?php _e( 'Four', 'dwwp-textdomain' )?></option>
+		          <option value="Three"><?php _e( 'Three', 'dwwp-textdomain' )?></option>
+		          <option value="Two"><?php _e( 'Two', 'dwwp-textdomain' )?></option>
+		          <option value="One"><?php _e( 'One', 'dwwp-textdomain' )?></option>
+		          
+		      	</select>
+		    </div>
+			<div class='form-group'>
+				<label for="user_review" class="form-control"><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
+	      		<textarea name="user_review" class="form-input" id="user_review" rows="8" placeholder="Tell US what You Thought..."></textarea>
+			</div>
 			
-			<label for="user_review" class=""><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
-	      	<textarea name="user_review" id="user_review" rows="8"></textarea>
-
-	      	<input type="submit">
+			<input type="submit">
 		</fieldset>
 	</form>
 
@@ -147,20 +151,30 @@ function dwwp_process_review_post() {
 add_action( 'init', 'dwwp_process_review_post' );
 
 /**
- * Enqueue Review Styles and Scripts
+ * Enqueue Admin Styles and Scripts
  */
 
-function dwwp_review_styles() {
+function dwwp_admin_review_styles() {
 
 	$screen = get_current_screen();
 
 	if ( is_object($screen) && 'review' == $screen->post_type ) {
-
-	wp_enqueue_style( 'review-styles', plugins_url( '/css/review.css', __FILE__ ) );
-
+		wp_enqueue_style( 'admin-review-styles', plugins_url( '/css/admin-review.css', __FILE__ ) );
 	}
+
 }
-add_action( 'admin_enqueue_scripts', 'dwwp_review_styles' );
+add_action( 'admin_enqueue_scripts', 'dwwp_admin_review_styles' );
+
+function dwwp_public_review_styles() {
+
+	global $post;
+
+	if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wp-user-review' ) ) {
+		wp_enqueue_style( 'review-styles', plugins_url( '/css/review.css', __FILE__ ) );
+	}
+
+}
+add_action( 'wp_enqueue_scripts', 'dwwp_public_review_styles' );
 
 /**
  * Add Custom Columns to Review list post table.

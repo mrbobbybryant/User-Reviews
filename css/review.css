@@ -1,3 +1,13 @@
-.review-title h2{
-	color: red;
+.form-legend{
+	font-size: 45px;
+}
+.form-group {
+  margin-bottom: 15px;
+  padding-bottom: 20px;
+}
+.form-control {
+	font-weight: bold;
+}
+.form_input{
+	padding-bottom: 20px;
 }

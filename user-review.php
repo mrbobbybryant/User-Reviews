@@ -46,7 +46,7 @@ function dwwp_review_form_shortcode ( $atts, $content = null ) {
 				<label for="user_review" class="form-control"><?php _e( 'User Review', 'dwwp-textdomain' )?></label>
 	      		<textarea name="user_review" class="form-input" id="user_review" rows="8" placeholder="Tell US what You Thought..."></textarea>
 			</div>
-			<input type="hidden" name="review-submitted" class="review-submitted" value="true" />
+			<input id="xyq" type="hidden" name="<?php echo apply_filters( 'honeypot_name', 'date-submitted'); ?>" class="date-submitted" value="" />
 			
 			<input id="form-review-submit" type="submit">
 		</fieldset>
@@ -123,17 +123,15 @@ add_action( 'init', 'dwwp_review_post_type' );
 
 function review_save_ajax() {
 	//Verify Form has content.
-	if ( ! isset( $_POST['dwwp-review-nonce'] ) ) {
+	if ( ! empty( $_POST['submission'] ) ) {
       return;
     }
     // Verify correct nonce
-    if ( ! wp_verify_nonce( $_POST['dwwp-review-nonce'], basename( __FILE__ ) ) ) {
-    	return;
-    }
+    check_ajax_referer( 'dwwp-review-nonce', 'security' );
 
     // Programmatically create new draft post.
 	$review_post = array(
-		'post_title' => sanitize_text_field( $_POST['movie_name'] . '-' . current_time('Y-m-d') ),
+		'post_title' => sanitize_text_field( $_POST['data']['movie_name'] . '-' . current_time('Y-m-d') ),
 		'post_status' => 'draft',
 		'post_type' => 'review',
 
@@ -142,14 +140,17 @@ function review_save_ajax() {
 	$the_post_id = wp_insert_post( $review_post, true );
 
 	//Store Custom Field Values.
-	$movie_rating = sanitize_text_field( $_POST['movie_rating'] );
-	$user_review = sanitize_text_field( $_POST['user_review'] ); 
+	$movie_rating = sanitize_text_field( $_POST['data']['movie_rating'] );
+	$user_review = sanitize_text_field( $_POST['data']['user_review'] );
 
 	//Process Custom fields into database.
 	update_post_meta( $the_post_id, 'movie_rating', $movie_rating );
 	update_post_meta( $the_post_id, 'user_review', $user_review );
+
+	wp_send_json_success();
 }
-add_action( 'wp_ajax_nopriv_review_save_post', 'dwwp_process_review_post' );
+add_action( 'wp_ajax_review_save_ajax', 'review_save_ajax' );
+add_action( 'wp_ajax_nopriv_review_save_ajax', 'review_save_ajax' );
 
 /**
  * Enqueue Admin Styles and Scripts

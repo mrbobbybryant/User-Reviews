@@ -3,22 +3,22 @@ jQuery(document).ready(function($) {
 
 		//Get the form data
 		var formData = {
-			'name'	: $('input[name=movie-name]').val(),
-			'rating': $('input[name=movie-rating]').val(),
-			'review'	: $('input[name=user-review]').val()
+			'movie_name'	: $(document.getElementById('movie_name')).val(),
+			'movie_rating': $(document.getElementById('movie_rating')).val(),
+			'user_review'	: $(document.getElementById('user_review')).val()
 		};
 		//process ajax
 		$.ajax({
 			type: 'POST',
 			dataType: 'json',
-			url: review_ajax.ajaxurl
+			url: review_ajax.ajaxurl,
 			data: {
 				action : 'review_save_ajax',
 				data : formData,
-				submission : $('.review-submitted').val(),
+				submission : $('#xyq').val(),
 				security: review_ajax.security
 			},
-			sucess: function(response) {
+			success: function(response) {
 				if ( true === response.success) {
 					alert('this was a success');
 				} else {

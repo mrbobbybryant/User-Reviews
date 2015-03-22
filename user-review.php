@@ -229,7 +229,7 @@ add_action( 'pre_get_posts', 'dwwp_review_column_orderby' );
 function dwwp_review_meta_box() {
     add_meta_box(
       'review_meta_box',
-      __( 'User Review'),
+      __( 'User Review', 'dwwp-textdomain' ),
       'review_meta_callback',
       'review'
     );

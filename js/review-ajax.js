@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	$( 'form' ).submit( function( e ) {
+	$( '#form-review' ).submit( function( e ) {
 
 		//Get the form data
 		var formData = {
@@ -13,10 +13,10 @@ jQuery(document).ready(function($) {
 			dataType: 'json',
 			url: review_ajax.ajaxurl
 			data: {
-				'action' : 'review_save_ajax',
-				'data' : formData
-				'submission' : $('.review-submitted').vel(),
-				'nonce' : $('dwwp-review-nonce').val
+				action : 'review_save_ajax',
+				data : formData,
+				submission : $('.review-submitted').val(),
+				security: review_ajax.security
 			},
 			sucess: function(response) {
 				if ( true === response.success) {
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
 				}
 			},
 			error: function(xhr,textStatus,e) {
-				
+
 			}
 		});
 	});

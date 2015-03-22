@@ -48,7 +48,7 @@ function dwwp_review_form_shortcode ( $atts, $content = null ) {
 			</div>
 			<input type="hidden" name="review-submitted" class="review-submitted" value="true" />
 			
-			<input class="form-review-submit" type="submit">
+			<input id="form-review-submit" type="submit">
 		</fieldset>
 	</form>
 
@@ -173,7 +173,7 @@ function dwwp_public_review_styles() {
 	if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wp-user-review' ) ) {
 		wp_enqueue_style( 'review-styles', plugins_url( '/css/review.css', __FILE__ ) );
 		wp_enqueue_script( 'review-js', plugins_url( '/js/review-ajax.js', __FILE__), array( 'jquery' ), '', true );
-		wp_localize_script( 'review-js', 'review_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), ) );
+		wp_localize_script( 'review-js', 'review_ajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'security' => wp_create_nonce( 'dwwp-review-nonce' ) ) );
 	}
 
 }
